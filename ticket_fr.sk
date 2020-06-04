@@ -1,0 +1,74 @@
+options:
+	token: votre_token #Token
+	bot: NomduBot #Nom du bot
+	adminrole: Administrateur #Vous devez écrire le nom du rôle Administrateur afin de pouvoir executer la commande !tickets (exemple: Administrateur)
+	name: Server #Nom de votre serveur
+	idchannel: 718242310080561212 #ID du channel où les joueurs devront réagir pour ouvrir un ticket.
+	idcategory: 593495192003149838 #ID de la catégorie pour stocker les tickets.
+	idroleadmin: 539936065079738382 #ID d'un rôle afin d'être notifié lorsqu'un ticket s'ouvre.
+	idstaffRole: 539938803972964366 #ID d'un rôle donnant accès au ticket (exemple: Modérateur)
+	website: https://hydeos.fr #URL de votre site web.
+	
+function updategame(t: text):
+	if {ticket} > 1:
+		mark "{@bot}" as playing "Regarde %{ticket}% tickets"
+	else:
+		mark "{@bot}" as playing "Regarde %{ticket}% ticket"
+
+on load:
+	if {ticket} is not set:
+		set {ticket} to 0
+	login to "{@token}" with name "{@bot}"
+	updategame("update")
+	
+discord command tickets:
+	prefixes: !
+	bots: {@bot}
+	executable in: guild
+	trigger:
+		purge event-message with "{@bot}"
+		if event-member doesn't have role named "{@adminrole}":
+			reply with ":x: Vous n'avez pas la permission :x:" and store it in {_reply}
+			wait 5 seconds
+			purge {_reply} with "{@bot}"
+		else:
+			make embed:
+				set title of embed to title with text "**Ticket**"
+				set the description of embed to "Bienvenue sur le support de **{@Name}** ! %nl%%nl% Merci de cliquer sur la **reaction** :white_check_mark: pour ouvrir un nouveau ticket %nl%%nl% Notre équipe répondra à votre **demande** le plus rapidement possible."
+				set color of embed to green
+			send the last created embed to event-channel with event-bot and store it in {_embed}
+			add reaction "white_check_mark" to reactions of {_embed}
+			
+on reaction add:
+	if event-channel's discord id is "{@idchannel}":
+		discord name of event-emote = "white_check_mark":
+			remove event-emote added by event-user from event-message
+			loop text channels of event-guild:
+				topic of loop-channel contains "%event-member%":
+					reply with ":x: Erreur: %mention tag of event-member% Vous possédez déjà un ticket :x:" and store it in {_reply}
+					wait 5 seconds
+					purge {_reply} with "{@bot}"
+					stop
+			create text channel:
+				set the name of the channel to "Ticket-%event-member%"
+				set the parent of the channel to category with id "{@idcategory}"
+				set topic of channel to "%event-member%"
+				create the channel in event-guild and store it in {_ticket}
+				add 1 to {ticket}
+				updategame("update")
+				send "%mention tag of event-member% %mention tag of role with id ""{@idroleadmin}""%" to channel with name "%{_ticket}%" with event-bot
+				create embed:
+					set the author info of the embed to author named "{@Name}" with url "{@website}" and icon "%avatar of event-bot%"
+					set description of embed to "Bienvenue sur le support de **{@Name}** ! %nl%%nl% Merci de détailler au maximum votre demande afin d'accélérer le procéssus de votre ticket.. %nl%%nl% Pour fermer le ticket, merci de cliquer sur la **reaction** :x: %nl% Notre équipe répondra à votre **demande** le plus rapidement possible."
+					set the color of embed to dark blue
+				send the last created embed to channel with name "%{_ticket}%" with event-bot and store it in {_embed}
+				add reaction "x" to reactions of {_embed}
+				set {_ticketID} to discord id of {_ticket}
+				allow event-member permissions (message history, view channel, message read, message write, message embed links and message attach files) in channel with id "%{_ticketID}%" with event-bot
+				allow role named "{@idstaffRole}" permissions (message history, view channel, message read, message write, message embed links and message attach files) in channel with id "%{_ticketID}%" with event-bot
+				deny public role of event-guild permission view channel in channel with id "%{_ticketID}%" with event-bot
+	discord name of event-emote = "x":
+		if discord name of event-channel contains "Ticket-":
+			remove 1 from {ticket}
+			updategame("update")
+			delete discord entity event-channel	
