@@ -39,6 +39,53 @@ discord command tickets:
 			send the last created embed to event-channel with event-bot and store it in {_embed}
 			add reaction "white_check_mark" to reactions of {_embed}
 			
+discord command add [<member>]:
+	description: Ajouter un utilisateur
+	prefixes: !
+	usage: user [<mention|user id|name##discriminator>]
+	bots: {@bot}
+	executable in: guild
+	trigger:
+		if event-member doesn't have role named "{@adminrole}":
+			reply with ":x: You don't have permission :x:" and store it in {_reply}
+			wait 5 seconds
+			purge {_reply} with "{@bot}"
+		else:
+			if arg-1 is not set:
+				reply with ":x: Error: %mention tag of event-member% !add @Acenox##6666 :x:" and store it in {_reply}
+				wait 5 seconds
+				purge {_reply} with "{@bot}"
+			else:
+				delete event-message with "{@bot}"
+				allow arg-1 permissions (message history, view channel, message read, message write, message embed links and message attach files) in event-channel with event-bot
+				reply with ":white_check_mark: %mention tag of event-member% You just added %arg-1% at the ticket :white_check_mark:" and store it in {_reply}
+				send "%mention tag of arg-1% you have just been added to the ticket !" to event-channel with event-bot 
+				wait 5 seconds
+				purge {_reply} with "{@bot}"
+				
+discord command remove [<member>]:
+	description: Retirer un utilisateur
+	prefixes: !
+	usage: user [<mention|user id|name##discriminator>]
+	bots: {@bot}
+	executable in: guild
+	trigger:
+		if event-member doesn't have role named "{@adminrole}":
+			reply with ":x: You don't have permission :x:" and store it in {_reply}
+			wait 5 seconds
+			purge {_reply} with "{@bot}"
+		else:
+			if arg-1 is not set:
+				reply with ":x: Erreur: %mention tag of event-member% !remove @Acenox##6666 :x:" and store it in {_reply}
+				wait 5 seconds
+				purge {_reply} with "{@bot}"
+			else:
+				delete event-message with "{@bot}"
+				deny arg-1 permissions (message history, view channel, message read, message write, message embed links and message attach files) in event-channel with event-bot
+				reply with ":white_check_mark: %mention tag of event-member% You just removed %arg-1% at the ticket :white_check_mark:" and store it in {_reply}
+				wait 5 seconds
+				purge {_reply} with "{@bot}"
+			
 on reaction add:
 	if event-channel's discord id is "{@idchannel}":
 		discord name of event-emote = "white_check_mark":
@@ -71,4 +118,4 @@ on reaction add:
 		if discord name of event-channel contains "Ticket-":
 			remove 1 from {ticket}
 			updategame("update")
-			delete discord entity event-channel	
+			delete discord entity event-channel
