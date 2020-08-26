@@ -116,6 +116,7 @@ on reaction add:
 				deny public role of event-guild permission view channel in channel with id "%{_ticketID}%" with event-bot
 	discord name of event-emote = "x":
 		if discord name of event-channel contains "Ticket-":
-			remove 1 from {ticket}
-			updategame("update")
-			delete discord entity event-channel
+			if bot state of event-user is false:
+				remove 1 from {ticket}
+				updategame("update")
+				delete discord entity event-channel
