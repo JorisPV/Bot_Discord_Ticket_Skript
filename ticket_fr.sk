@@ -2,7 +2,7 @@ options:
 	token: votre_token #Token
 	bot: NomduBot #Nom du bot
 	adminrole: Administrateur #Vous devez écrire le nom du rôle Administrateur afin de pouvoir executer la commande !tickets (exemple: Administrateur)
-	name: Server #Nom de votre serveur
+	Name: Server #Nom de votre serveur
 	idchannel: 718242310080561212 #ID du channel où les joueurs devront réagir pour ouvrir un ticket.
 	idcategory: 593495192003149838 #ID de la catégorie pour stocker les tickets.
 	idroleadmin: 539936065079738382 #ID d'un rôle afin d'être notifié lorsqu'un ticket s'ouvre.
