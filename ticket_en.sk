@@ -2,7 +2,7 @@ options:
 	token: your_token #Token
 	bot: NameOfyourBot #Name of your bot
 	adminrole: Administrator #You must write the exact name of the Administrator role for your server. Example: Administrator.
-	name: Server #Server name
+	Name: Server #Server name
 	idchannel: 718242310080561212 #Define a room ID to which players should click on the reaction.
 	idcategory: 593495192003149838 #Define a category ID in order to store tickets in this category.
 	idroleadmin: 539936065079738382 #If you wish to be mentioned when a ticket is created
